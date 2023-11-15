@@ -29,7 +29,7 @@ def factorize(n):
     return factors
 '''
 def decrypt_rsa(e, N, C):
-    factors = factorize(N)
+    factors = factorint(N)
     if len(factors) != 2:
         raise ValueError("N needs to be a product of two distinct primes")
     p,q = factors
@@ -41,6 +41,5 @@ def decrypt_rsa(e, N, C):
 e = 17
 N = 38210080753993935337519
 C = 29202530725918700842079
-print("hello")
 M = decrypt_rsa(e, N, C)
-print(M)
+print("The secret number M is: ",M)
