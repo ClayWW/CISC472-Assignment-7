@@ -22,7 +22,7 @@ def factorize(n):
         if n % i:
             i += 1
         else:
-            n //= 1
+            n //= i
             factors.append(i)
     if n > 1:
         factors.append(n)
@@ -34,12 +34,23 @@ def decrypt_rsa(e, N, C):
         raise ValueError("N needs to be a product of two distinct primes")
     p,q = factors
     phi = (p-1)*(q-1)
+    if phi % e == 0:
+        raise Exception(f"e = {e} is not relatively prime to phi(N)")
     d = modinv(e, phi)
     M = pow(C, d, N)
     return M
+
+#Part a
 
 e = 17
 N = 38210080753993935337519
 C = 29202530725918700842079
 M = decrypt_rsa(e, N, C)
 print("The secret number M is: ",M)
+
+#Part b
+e = 3
+N = 237586812181653994808797835837127641
+C = 14621362594515611576696983236378624
+M = decrypt_rsa(e, N, C)
+print("The secret number M is: ", M)
