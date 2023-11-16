@@ -1,7 +1,6 @@
 from sympy.ntheory import factorint
 from sympy.ntheory import isprime
-from math import gcd
-
+import math
 def egcd(a, b):
     if a == 0:
         return (b, 0, 1)
@@ -27,38 +26,61 @@ def decrypt_rsa(e, N, C):
         raise ValueError("The product of the factors does not equal N")
     phi = (p-1)*(q-1)
     print("Phi: ", phi)
-    print(gcd(e,phi))
-    if gcd(e, phi) != 1:
+    print(math.gcd(e,phi))
+    if math.gcd(e, phi) != 1:
         raise Exception(f"e = {e} is not relatively prime to phi(N)")
     d = modinv(e, phi)
     M = pow(C, d, N)
     return M
 
 def decrypt_rsa_single_prime(e, N, C):
-    if not isprime(N):
-        raise ValueError("N has to be prime")
-    phi = N-1
-    d = modinv(e, phi)
+    p = math.isqrt(N)
+    if not isprime(p):
+        raise ValueError("The square root of N is not prime, invalid N given assumptions")
+    phi = (p-1)**2
+    d = pow(e, -1, phi)
     M = pow(C, d, N)
     return M
+
+def eth_root(C, e):
+    high = 1
+    while high ** e <= C:
+        high *= 2
+    low = high//2
+
+    while low < high:
+        mid = (low + high) // 2
+        if mid ** e < C:
+            low = mid+1
+        else:
+            high = mid
+    return low if low ** e == C else low-1
 
 #Part a
 
 e = 17
 N = 38210080753993935337519
 C = 29202530725918700842079
+'''
 M = decrypt_rsa(e, N, C)
+print("The secret number M is: ",M)
+'''
+M = eth_root(C, e)
 print("The secret number M is: ",M)
 
 #Part b
 
-'''
+
 e = 3
 N = 237586812181653994808797835837127641
 C = 14621362594515611576696983236378624
+'''
 M = decrypt_rsa(e, N, C)
 print("The secret number M is: ", M)
 '''
+
+M_b = eth_root(C, e)
+print("The secret number M is: ", M_b)
 
 #Part c
 
