@@ -20,11 +20,29 @@ def recover_rsa_sig(h_prime, s_bob_prime, e, N, append_length):
 
     k = append_length * 4
     H = h_prime >> k
-    s_bob = (s_bob_prime * modinv(16 ** (k*e), N)) % N
-    s_bob_hex = hex(s_bob)
-    H_hex = hex(H)
 
-    return H_hex, s_bob_hex
+    factor = pow(16, k * e, N)
+
+    mod_inv_factor = modinv(factor, N)
+    s_bob = (s_bob_prime * mod_inv_factor) % N
+
+    print("H_prime:", hex(h_prime))
+    print("S_bob_prime:", hex(s_bob_prime))
+    #print("Modular Inverse:", hex(mod_inv))
+    print("Recovered H:", hex(H))
+    print("Recovered Signature:", hex(s_bob))
+
+    return hex(H), hex(s_bob)
+
+def verify_sig(H, s_bob, e, N):
+    H = int(H, 16)
+    s_bob = int(s_bob, 16)
+    e = int(e, 16)
+    N = int(N, 16)
+
+    compute_H = pow(s_bob, e, N)
+    print("Computed H from Signature:", hex(compute_H))
+    return compute_H == H
 
 h_prime = "0x9a4636438e6bd94b0103c26d9973680e00000"
 s_bob_prime = "0x3d99849cce273e20ce5fa8785a29f0bf458b8cfb"
@@ -35,4 +53,8 @@ append_length = 5
 H, s_bob = recover_rsa_sig(h_prime, s_bob_prime, e, N, append_length)
 print("Original Hash (H):", H)
 print("Bob's Signature on H:", s_bob)
+
+is_valid = verify_sig(H, s_bob, e, N)
+print("Is the signature valid?", is_valid)
+
 
